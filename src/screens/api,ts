@@ -1,0 +1,8 @@
+import {PetApi, UserApi,Configuration} from '../../generated';
+
+const config = new Configuration();
+
+const petApi = new PetApi(config, 'example.com',);
+const userApi = new UserApi(config, 'example.com',);
+
+export {petApi, userApi};
