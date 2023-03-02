@@ -5,25 +5,57 @@ export default function CoffeeAutonomous() {
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [summeryData, setSummeryData] = useState([]);
+    // const fetchData = async () => {
+    //     const resp = await fetch("http://ec2-65-0-104-33.ap-south-1.compute.amazonaws.com:8080/crud/creators");
+    //     const data = await resp.json();
+    //     setData(data);
+    //     setLoading(false);
+    // };
 
     const fetchData = async () => {
-        const resp = await fetch("https://api.sampleapis.com/coffee/hot");
-        const data = await resp.json();
-        setData(data);
-        setLoading(false);
+        try {
+            const response = await fetch('http://ec2-65-0-104-33.ap-south-1.compute.amazonaws.com:8080/crud/creators', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Basic cGVla2FVc2VyOnBlZWthQDEyMw==',
+                },
+            });
+            const jsonData = await response.json();
+            setData(jsonData['channelList']);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchSummeryData = async () => {
+        try {
+            const response = await fetch('http://ec2-65-0-104-33.ap-south-1.compute.amazonaws.com:8080/reeds/', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Basic cGVla2FVc2VyOnBlZWthQDEyMw==',
+                },
+            });
+            const jsonData = await response.json();
+            setSummeryData(jsonData);
+            console.log(summeryData['reeds'][0])
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const renderItem = ({ item }) => {
         return (
             <Box px={5} py={2} rounded="md" bg="primary.300" my={2}>
-                {item.title}
+                {item.channelName}
             </Box>
         );
     };
 
     useEffect(() => {
         fetchData();
-        console.log(data)
+        fetchSummeryData();
     }, []);
 
     return (
@@ -35,7 +67,7 @@ export default function CoffeeAutonomous() {
                     <FlatList
                         data={data}
                         renderItem={renderItem}
-                        keyExtractor={(item) => item.id.toString()}
+                        keyExtractor={(item) => item.channelId.toString()}
                     />
                 )}
             </Center>
