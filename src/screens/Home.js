@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity, FlatList, ScrollView, Dimensions } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -74,9 +74,9 @@ function Home({ navigation }) {
         try {
             const params = new URLSearchParams();
             params.append('pageNo', 1);
-            params.append('pageSize', 2);
+            params.append('pageSize', 20);
 
-            const response = await fetch(`http://ec2-65-0-104-33.ap-south-1.compute.amazonaws.com:8080/saaraansh/reeds?${params.toString()}`, {
+            const response = await fetch(`http://ec2-13-233-46-37.ap-south-1.compute.amazonaws.com:8080/saaraansh/reeds?${params.toString()}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: 'Basic cGVla2FVc2VyOnBlZWthQDEyMw==',
@@ -85,34 +85,31 @@ function Home({ navigation }) {
             const jsonData = await response.json();
             setReedsData(jsonData['reeds']);
             setSummeryData(jsonData['reeds'][0]['summaries'][0]['chapters'])
-            console.log('hhhhhhhhhhhhhhhhhh', jsonData['reeds'])
+            // console.log('hhhhhhhhhhhhhhhhhh', jsonData['reeds'])
         } catch (error) {
             console.error(error);
         }
     };
 
+    // const flatListRef = useRef(null)
+    // let index = 0;
+    // const totalIndex = reedsData.length - 1;
 
+    // useEffect(() => {
+    //     setInterval(() => {
+    //         index++;
+    //         if (index < totalIndex) {
+    //             flatListRef.current.scrollToIndex({ animated: true, index: index })
+    //         }
+    //         else {
+    //             flatListRef.current.scrollToIndex({ animated: true, index: 0 })
+    //         }
+    //     }, 100000)
+    // }, []);
 
+    const Item = ({ title, uri, publisherName, summaries, item, item2 }) => (
 
-    const fetchSummeryData2 = async () => {
-        try {
-            const response = await fetch(`http://ec2-65-0-104-33.ap-south-1.compute.amazonaws.com:8080/saaraansh/reeds?${params.toString()}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Basic cGVla2FVc2VyOnBlZWthQDEyMw==',
-                },
-            });
-            const jsonData = await response.json();
-
-            console.log('hhhhhhhhhhhhhhhhhh', jsonData['reeds'])
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const Item = ({ title, uri, publisherName, summaries }) => (
-
-        <View style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('CardDetails', { item, item2 })}>
 
             <View style={{ flexDirection: 'row' }}>
 
@@ -203,10 +200,10 @@ function Home({ navigation }) {
             </View>
 
 
-        </View >
+        </TouchableOpacity >
     );
 
-    const ChaptersData = ({ channelName, imageUrl, item, channelId }) => (
+    const ChaptersData = ({ item, }) => (
         <View style={{ paddingLeft: 15 }}>
 
             <Text numberOfLines={1} style={{
@@ -293,9 +290,8 @@ function Home({ navigation }) {
                     vertical
                     data={reedsData}
                     renderItem={({ item }) => <Item title={item.name} uri={item.thumbnail}
-                        summaries={item.summaries} publisherName={item.channelName}
-                    // chapters={}
-                    // paraTitle={item.paraTitle} 
+                        summaries={item.summaries} publisherName={item.channelName} item={item}
+                        item2={summeryData}
                     />}
                 />
             </View>
@@ -312,7 +308,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: responsiveFontSize(2.5), fontFamily: 'Poppins-Bold',
         color: 'black', width: responsiveWidth(74),
-        margin: 5, marginTop: 12,
+        margin: 5, marginTop: 12, width: responsiveWidth(70),
         fontWeight: '500', letterSpacing: 0.5,
     },
     item: {

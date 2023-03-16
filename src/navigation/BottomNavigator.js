@@ -23,6 +23,8 @@ import PremiumScreen from '../screens/PremiumScreen'
 import LibraryScreen from '../screens/LibraryScreen';
 import CoffeeAutonomous from '../screens/CoffeeAutonomous';
 import ArtistSelection from '../screens/ArtistSelection';
+import CardDetails from '../screens/CardDetails';
+import LogInScreen from '../screens/LogInScreen';
 
 const HomeStack = createNativeStackNavigator();
 
@@ -60,8 +62,16 @@ function HomeStackScreen() {
           component={LibraryScreen}
           options={{ headerShown: false }}
         />
-
-
+        <HomeStack.Screen
+          name="CardDetails"
+          component={CardDetails}
+          options={{ headerShown: false }}
+        />
+        <HomeStack.Screen
+          name="LogInScreen"
+          component={LogInScreen}
+          options={{ headerShown: false }}
+        />
       </HomeStack.Navigator>
     </>
   );

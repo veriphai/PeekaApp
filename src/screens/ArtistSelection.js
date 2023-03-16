@@ -18,7 +18,6 @@ export default function ArtistSelection({ }) {
 
     const navigation = useNavigation();
 
-    const [isActive, setIsActive] = useState(['dummy', "8", "7", "5", "1", "2", "3"]);
     const [tranList, setTranList] = useState(['dummy'])
     const [data, setData] = useState([]);
 
@@ -111,7 +110,7 @@ export default function ArtistSelection({ }) {
 
     const fetchData = async () => {
         try {
-            const response = await fetch('http://ec2-65-0-104-33.ap-south-1.compute.amazonaws.com:8080/saaraansh/creators', {
+            const response = await fetch('http://ec2-13-233-46-37.ap-south-1.compute.amazonaws.com:8080/saaraansh/creators', {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: 'Basic cGVla2FVc2VyOnBlZWthQDEyMw==',
@@ -131,8 +130,6 @@ export default function ArtistSelection({ }) {
 
         if (cond != id) {
             setTranList(list => [...list, id])
-
-
         }
 
         else {
@@ -146,9 +143,6 @@ export default function ArtistSelection({ }) {
         }
 
     }
-
-
-
 
     const getItemStyles = id => {
         if (tranList.find(data => data === id)) return 'black';
@@ -203,10 +197,10 @@ export default function ArtistSelection({ }) {
     };
 
     return (
-        <ScrollView sty={styles.main}>
+        <ScrollView contentContainerStyle={styles.main}>
             <Text style={{
                 alignSelf: 'center', marginTop: 15, fontFamily: 'Poppins-Bold', height: responsiveHeight(3),
-                color: 'grey', fontSize: responsiveFontSize(1.8)
+                color: 'grey', fontSize: responsiveFontSize(1.8),
 
 
             }}>Welcome to</Text>
@@ -260,13 +254,13 @@ export default function ArtistSelection({ }) {
 
             </View>
             {/* 
-            <View style={{ height: height * 0.1 }} /> */}
+            <View style={{ height: responsiveHeight(10) }} /> */}
 
             <View style={{
                 alignItems: 'center', flexDirection: 'row',
-                marginLeft: 10, alignSelf: 'baseline',
+                paddingLeft: 10,
             }}>
-                <TouchableOpacity  >
+                <TouchableOpacity onPress={() => navigation.navigate('LogInScreen')}>
                     <Ionicons
                         name={'chevron-back-circle-outline'}
                         color={'black'}
@@ -296,7 +290,7 @@ export default function ArtistSelection({ }) {
 }
 const styles = StyleSheet.create({
     main: {
-        flex: 1,
+
         backgroundColor: '#fff'
     },
     container: {
@@ -305,14 +299,14 @@ const styles = StyleSheet.create({
     item: {
         flexDirection: 'row', margin: 3, display: 'flex',
         flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center',
-        borderRadius: 15, height: responsiveHeight(4.5), backgroundColor: 'white'
+        borderRadius: 15, height: 35, backgroundColor: 'white'
     },
     title: {
         fontSize: responsiveFontSize(1.9), marginRight: 5, color: 'grey', textAlignVertical: 'center',
         marginLeft: 3, alignSelf: 'center', fontFamily: 'Poppins-SemiBold',
     },
     button: {
-        width: responsiveWidth(77), height: responsiveHeight(7), marginLeft: 5,
+        width: responsiveWidth(77), height: 50, marginLeft: 5,
         borderRadius: 60, justifyContent: 'center'
     },
 })
