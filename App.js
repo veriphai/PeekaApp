@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomNavigator from './src/navigation/BottomNavigator';
 import ArtistSelection from "./src/screens/ArtistSelection";
+import LogInScreen from "./src/screens/LogInScreen";
 const { width, height, } = Dimensions.get('window');
 
 
@@ -31,7 +32,11 @@ const PeekaApp = () => {
         component={ArtistSelection}
         options={{ headerShown: false }}
       />
-
+      <Stack.Screen
+        name="LogInScreen"
+        component={LogInScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="BottomNavigator"
         component={BottomNavigator}

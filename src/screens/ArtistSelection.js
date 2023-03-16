@@ -18,8 +18,8 @@ export default function ArtistSelection({ }) {
 
     const navigation = useNavigation();
 
-    const [isActive, setIsActive] = useState(['dummy', "8", "7", "5", "1", "2", "3"]);
     const [tranList, setTranList] = useState(['dummy'])
+    const [data, setData] = useState([]);
 
     // useEffect(() => console.log('mounted', tranList), [tranList]);
 
@@ -103,15 +103,33 @@ export default function ArtistSelection({ }) {
 
     ];
 
+    useEffect(() => {
+        fetchData();
 
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const response = await fetch('http://ec2-13-233-46-37.ap-south-1.compute.amazonaws.com:8080/saaraansh/creators', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Basic cGVla2FVc2VyOnBlZWthQDEyMw==',
+                },
+            });
+            const jsonData = await response.json();
+            setData(jsonData['channelList']);
+            console.log(data)
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const SelectandUnselectItem = (id) => {
         let cond = tranList.find(data => data === id)
 
         if (cond != id) {
             setTranList(list => [...list, id])
-
-
         }
 
         else {
@@ -126,9 +144,6 @@ export default function ArtistSelection({ }) {
 
     }
 
-
-
-
     const getItemStyles = id => {
         if (tranList.find(data => data === id)) return 'black';
         if (tranList.find(data => data != id)) return 'white';
@@ -142,24 +157,24 @@ export default function ArtistSelection({ }) {
         return 'black';
     };
 
-    const listViews = ({ title, uri, item, id }) => (
+    const listViews = ({ channelName, imageUrl, item, channelId }) => (
 
         <TouchableOpacity style={[styles.item,
-        { backgroundColor: getItemStyles(id) }]}
+        { backgroundColor: getItemStyles(channelId) }]}
             onPress={() => {
-                SelectandUnselectItem(id)
+                SelectandUnselectItem(channelId)
 
             }}
         >
 
-            <Avatar rounded source={{ uri: uri }}
-                size={28} containerStyle={{ alignSelf: 'center', marginLeft: 2, marginTop: 5 }} />
+            <Avatar rounded source={{ uri: imageUrl }}
+                size={30} containerStyle={{ alignSelf: 'center', marginLeft: 2, marginTop: 5 }} />
 
             <Text style={[styles.title,
-            { color: getItemTextStyles(id) }
+            { color: getItemTextStyles(channelId) }
 
             ]}
-                numberOfLines={1} ellipsizeMode={'tail'}>{title}</Text>
+                numberOfLines={1} ellipsizeMode={'tail'}>{channelName}</Text>
         </TouchableOpacity>
     );
     let listLength = tranList.length
@@ -182,33 +197,18 @@ export default function ArtistSelection({ }) {
     };
 
     return (
-        <ScrollView sty={styles.main}>
+        <ScrollView contentContainerStyle={styles.main}>
             <Text style={{
                 alignSelf: 'center', marginTop: 15, fontFamily: 'Poppins-Bold', height: responsiveHeight(3),
-                fontWeight: '500', color: 'grey', fontSize: responsiveFontSize(1.9)
+                color: 'grey', fontSize: responsiveFontSize(1.8),
+
+
             }}>Welcome to</Text>
 
             <Text style={{
-                // alignSelf: 'center', fontSize: responsiveFontSize(4),
-                // color: 'black', fontWeight: 'bold', fontFamily: 'Poppins-Bold',
+                alignSelf: 'center', fontFamily: 'Poppins-Bold', letterSpacing: 1,
+                color: 'black', fontSize: responsiveFontSize(3)
 
-
-                width: normalizeFontSize(76),
-                height: normalizeFontSize(30),
-                left: 150,
-
-                fontFamily: 'Poppins',
-                fontStyle: 'normal',
-                fontWeight: '900',
-                fontSize: normalizeFontSize(20),
-                lineHeight: normalizeFontSize(30),
-                /* identical to box height */
-
-                textAlign: 'center',
-                letterSpacing: normalizeFontSize(2),
-                textTransform: 'uppercase',
-
-                color: '#000000',
             }}>PEEKA</Text>
 
             {/* Indicator */}
@@ -233,20 +233,20 @@ export default function ArtistSelection({ }) {
             </View>
 
             <Text style={{
-                fontSize: responsiveFontSize(2.6), marginLeft: 15, marginTop: 18,
-                color: 'black', fontWeight: 'bold', fontFamily: 'Poppins-Bold',
+                fontSize: responsiveFontSize(2.2), marginLeft: 15, marginTop: 16,
+                color: 'black', fontFamily: 'Poppins-Bold',
             }}>Tell us the people you like :</Text>
 
             <Text style={{
-                marginLeft: 15, marginTop: 6, color: 'grey', fontFamily: 'Poppins-Regular',
-                fontWeight: '500', fontSize: responsiveFontSize(1.8), marginBottom: 15
+                marginLeft: 15, marginTop: 6, color: 'grey', fontFamily: 'Poppins-SemiBold',
+                fontSize: responsiveFontSize(1.9), marginBottom: 13
             }}>Choose 3 or more</Text>
 
-            <View style={{ display: 'flex', flexWrap: 'wrap', height: responsiveHeight(62), }}>
+            <View style={{ display: 'flex', flexWrap: 'wrap', height: responsiveHeight(64), }}>
 
                 <ScrollView>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                        {DATA.map((item, index,) => {
+                        {data.map((item, index,) => {
                             return listViews(item,)
                         })}
                     </View>
@@ -254,13 +254,13 @@ export default function ArtistSelection({ }) {
 
             </View>
             {/* 
-            <View style={{ height: height * 0.1 }} /> */}
+            <View style={{ height: responsiveHeight(10) }} /> */}
 
             <View style={{
                 alignItems: 'center', flexDirection: 'row',
-                marginLeft: 10, alignSelf: 'baseline',
+                paddingLeft: 10,
             }}>
-                <TouchableOpacity  >
+                <TouchableOpacity onPress={() => navigation.navigate('LogInScreen')}>
                     <Ionicons
                         name={'chevron-back-circle-outline'}
                         color={'black'}
@@ -268,13 +268,21 @@ export default function ArtistSelection({ }) {
                     />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.button, { backgroundColor: listLength <= 3 ? 'white' : 'black', borderWidth: 2, borderColor: 'black' }]}
-                    onPress={() => listLength <= 3 ? '' : navigation.navigate('BottomNavigator', { screen: 'Home' })}>
+                {listLength <= 3 ? (<View style={[styles.button, { backgroundColor: listLength <= 3 ? 'white' : 'black', borderWidth: 2, borderColor: 'black' }]}
+                >
                     <Text style={{
                         fontSize: responsiveFontSize(2.6), alignSelf: 'center', fontFamily: 'Poppins-Bold',
-                        color: listLength <= 3 ? 'black' : 'white', fontWeight: 'bold',
+                        color: listLength <= 3 ? 'black' : 'white',
                     }}>NEXT</Text>
-                </TouchableOpacity>
+                </View>
+                ) :
+                    <TouchableOpacity style={[styles.button, { backgroundColor: listLength <= 3 ? 'white' : 'black', borderWidth: 2, borderColor: 'black' }]}
+                        onPress={() => listLength <= 3 ? '' : navigation.navigate('BottomNavigator', { screen: 'Home' })}>
+                        <Text style={{
+                            fontSize: responsiveFontSize(2.6), alignSelf: 'center', fontFamily: 'Poppins-Bold',
+                            color: listLength <= 3 ? 'black' : 'white',
+                        }}>NEXT</Text>
+                    </TouchableOpacity>}
             </View>
 
         </ScrollView>
@@ -282,7 +290,7 @@ export default function ArtistSelection({ }) {
 }
 const styles = StyleSheet.create({
     main: {
-        flex: 1,
+
         backgroundColor: '#fff'
     },
     container: {
@@ -290,15 +298,15 @@ const styles = StyleSheet.create({
     },
     item: {
         flexDirection: 'row', margin: 3, display: 'flex',
-        flexWrap: 'wrap', alignItems: 'center',
-        borderRadius: 15, height: responsiveHeight(4.5), backgroundColor: 'white'
+        flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center',
+        borderRadius: 15, height: 35, backgroundColor: 'white'
     },
     title: {
-        fontSize: responsiveFontSize(1.9), marginRight: 5, color: 'grey',
+        fontSize: responsiveFontSize(1.9), marginRight: 5, color: 'grey', textAlignVertical: 'center',
         marginLeft: 3, alignSelf: 'center', fontFamily: 'Poppins-SemiBold',
     },
     button: {
-        width: responsiveWidth(77), height: responsiveHeight(7), marginLeft: 5,
+        width: responsiveWidth(77), height: 50, marginLeft: 5,
         borderRadius: 60, justifyContent: 'center'
     },
 })

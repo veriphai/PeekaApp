@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity, FlatList, ScrollView, Dimensions } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -8,6 +8,9 @@ import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Avatar, withBadge } from 'react-native-elements';
 import TypeWriter from 'react-native-typewriter'
+import { SwiperFlatList } from 'react-native-swiper-flatlist';
+import { useIsFocused } from '@react-navigation/native';
+
 import {
     responsiveHeight,
     responsiveWidth,
@@ -16,8 +19,10 @@ import {
 
 function Home({ navigation }) {
 
-    const [email, setEmail] = useState();
-    const [images, setImages] = useState();
+    // const [email, setEmail] = useState();
+    const isFocused = useIsFocused();
+    const [summeryData, setSummeryData] = useState();
+    const [reedsData, setReedsData] = useState([]);
 
     const DATA = [
         {
@@ -61,64 +66,96 @@ function Home({ navigation }) {
 
     ];
 
-    const Item = ({ title, uri, item, publisherName, paraTitle, chapters }) => (
-        <View style={styles.item}>
-            <View style={{ height: responsiveHeight(73) }}>
-                <View style={{ flexDirection: 'row' }}>
+    useEffect(() => {
+        fetchSummeryData();
+    }, [isFocused]);
 
-                    <Avatar rounded source={{ uri: uri }}
-                        size={50} containerStyle={{ margin: 15 }} />
+    const fetchSummeryData = async () => {
+        try {
+            const params = new URLSearchParams();
+            params.append('pageNo', 1);
+            params.append('pageSize', 20);
 
-                    <Text style={styles.title}
-                        numberOfLines={2} ellipsizeMode={'tail'}>{title}</Text>
-                </View>
+            const response = await fetch(`http://ec2-13-233-46-37.ap-south-1.compute.amazonaws.com:8080/saaraansh/reeds?${params.toString()}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Basic cGVla2FVc2VyOnBlZWthQDEyMw==',
+                },
+            });
+            const jsonData = await response.json();
+            setReedsData(jsonData['reeds']);
+            setSummeryData(jsonData['reeds'][0]['summaries'][0]['chapters'])
+            // console.log('hhhhhhhhhhhhhhhhhh', jsonData['reeds'])
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-                <View style={{
-                    flexDirection: 'row', alignItems: 'center',
-                    marginBottom: responsiveHeight(1.5),
-                }}>
+    // const flatListRef = useRef(null)
+    // let index = 0;
+    // const totalIndex = reedsData.length - 1;
 
-                    <Text numberOfLines={1} style={{
-                        fontWeight: '500', fontFamily: 'Poppins-SemiBold',
-                        fontSize: responsiveFontSize(2), marginLeft: responsiveWidth(22), width: responsiveWidth(49), color: 'grey'
-                    }}>{publisherName}</Text>
+    // useEffect(() => {
+    //     setInterval(() => {
+    //         index++;
+    //         if (index < totalIndex) {
+    //             flatListRef.current.scrollToIndex({ animated: true, index: index })
+    //         }
+    //         else {
+    //             flatListRef.current.scrollToIndex({ animated: true, index: 0 })
+    //         }
+    //     }, 100000)
+    // }, []);
 
-                    <TouchableOpacity style={{
-                        backgroundColor: 'rgb(224,224,224)', width: responsiveWidth(20), alignItems: 'center',
-                        borderRadius: 20, height: responsiveHeight(3.6), justifyContent: 'center'
-                    }}>
-                        <Text style={{
-                            fontSize: responsiveFontSize(1.9), alignSelf: 'center',
-                            color: 'black', fontFamily: 'Poppins-Bold', fontWeight: 'bold',
-                        }}>Follow</Text>
+    const Item = ({ title, uri, publisherName, summaries, item, item2 }) => (
 
-                    </TouchableOpacity>
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('CardDetails', { item, item2 })}>
 
-                </View>
+            <View style={{ flexDirection: 'row' }}>
 
-                <View style={{ paddingLeft: 15 }}>
+                <Avatar rounded source={{ uri: uri }}
+                    size={50} containerStyle={{ margin: 15 }} />
 
-                    <Text numberOfLines={1} style={{
-                        fontSize: responsiveFontSize(2), fontFamily: 'Poppins-Bold',
-                        color: '#e6b800', fontWeight: 'bold',
-                    }}>chapter {chapters}</Text>
-
-                    <Text numberOfLines={1} style={{
-                        fontSize: responsiveFontSize(2.5), fontFamily: 'Poppins-Bold',
-                        color: 'black', fontWeight: 'bold', marginBottom: responsiveHeight(1.6)
-                    }}>{paraTitle}</Text>
-
-
-
-                    <TypeWriter style={{ height: responsiveHeight(50), fontFamily: 'Poppins-Medium', color: 'grey', textAlign: 'left', fontSize: responsiveFontSize(2), }} numberOfLines={16} typing={2}>
-                        Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu
-                        Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu
-                        Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu
-
-                    </TypeWriter>
-                </View>
+                <Text style={styles.title}
+                    numberOfLines={2} ellipsizeMode={'tail'}>{title}</Text>
             </View>
-            <View style={{ flexDirection: "row", margin: 10, paddingLeft: '1.5%' }}>
+
+            <View style={{
+                flexDirection: 'row', alignItems: 'center',
+                marginBottom: responsiveHeight(1.5),
+            }}>
+
+                <Text numberOfLines={1} style={{
+                    fontFamily: 'Poppins-SemiBold', letterSpacing: 0.5,
+                    fontSize: responsiveFontSize(1.9), marginLeft: responsiveWidth(22), width: responsiveWidth(49), color: 'grey'
+                }}>{publisherName}</Text>
+
+                <TouchableOpacity style={{
+                    backgroundColor: 'rgb(224,224,224)', width: responsiveWidth(20), alignItems: 'center',
+                    borderRadius: 20, height: responsiveHeight(3.6), justifyContent: 'center'
+                }}  >
+                    <Text style={{
+                        fontSize: responsiveFontSize(1.8), alignSelf: 'center',
+                        color: 'black', fontFamily: 'Poppins-Bold', textAlignVertical: 'center'
+                    }}>Follow</Text>
+
+                </TouchableOpacity>
+
+            </View>
+
+            <ScrollView>
+
+                <FlatList
+                    data={summaries[0].chapters}
+                    renderItem={({ item }) => <ChaptersData item={item} />}
+                    keyExtractor={item => item.id}
+
+                />
+            </ScrollView>
+
+
+
+            <View style={{ flexDirection: "row", margin: 10, paddingLeft: '1.5%', alignSelf: 'center' }}>
 
                 <TouchableOpacity>
                     <AntDesign
@@ -139,8 +176,8 @@ function Home({ navigation }) {
                 </TouchableOpacity>
 
                 <Text numberOfLines={1} style={{
-                    fontWeight: '500', marginRight: responsiveWidth(6), color: 'grey',
-                    fontSize: responsiveFontSize(1.8), marginLeft: responsiveWidth(6), fontFamily: 'Poppins-Bold',
+                    marginRight: responsiveWidth(6), color: 'grey',
+                    fontSize: responsiveFontSize(1.7), marginLeft: responsiveWidth(6), fontFamily: 'Poppins-SemiBold',
                 }}>read time - ch 1</Text>
 
                 <TouchableOpacity>
@@ -163,16 +200,37 @@ function Home({ navigation }) {
             </View>
 
 
-        </View>
+        </TouchableOpacity >
     );
 
+    const ChaptersData = ({ item, }) => (
+        <View style={{ paddingLeft: 15 }}>
+
+            <Text numberOfLines={1} style={{
+                fontSize: responsiveFontSize(1.8), fontFamily: 'Poppins-SemiBold',
+                color: '#e6b800',
+            }}>chapter :
+                {item.number}
+            </Text>
+
+            <Text numberOfLines={1} style={{
+                fontSize: responsiveFontSize(2), fontFamily: 'Poppins-Bold', marginTop: responsiveHeight(0.2),
+                color: 'black', marginBottom: responsiveHeight(1)
+            }}>
+                {item.name}
+            </Text>
+            <TypeWriter style={{ height: responsiveHeight(48), letterSpacing: 0.5, lineHeight: 32, fontFamily: 'Poppins-SemiBold', color: 'grey', textAlign: 'left', fontSize: responsiveFontSize(2), }} numberOfLines={11} typing={2}>
+                {item.data}
+            </TypeWriter>
+        </View>
+    );
 
     return (
         < View style={styles.Screen}>
 
             <View style={{
                 margin: 5, flexDirection: 'row', marginBottom: responsiveHeight(1.5),
-                padding: 5, marginTop: responsiveHeight(1.5), alignItems: 'center', justifyContent: 'center'
+                padding: 3, marginTop: responsiveHeight(1.5), alignItems: 'center', justifyContent: 'center'
             }}>
                 <Text style={{
                     fontSize: responsiveFontSize(2.5), fontFamily: 'Poppins-Bold',
@@ -189,9 +247,9 @@ function Home({ navigation }) {
 
 
                 <View style={{
-                    backgroundColor: 'rgb(224,224,224)', flexDirection: 'row', width: responsiveWidth(40),
+                    backgroundColor: 'rgb(224,224,224)', flexDirection: 'row', width: responsiveWidth(44),
                     height: responsiveHeight(3.5), borderRadius: 10,
-                    marginLeft: responsiveWidth(20),
+                    marginLeft: responsiveWidth(17),
                     alignSelf: 'center', marginRight: 5, alignItems: 'center'
                 }}>
                     <Ionicons
@@ -202,12 +260,12 @@ function Home({ navigation }) {
                     />
 
                     <Text style={{
-                        fontSize: responsiveFontSize(1.5), marginLeft: 15, fontFamily: 'Poppins-Bold',
-                        color: 'black', fontWeight: 'bold',
+                        fontSize: responsiveFontSize(1.5), marginLeft: 9, fontFamily: 'Poppins-Bold',
+                        color: 'black', letterSpacing: 0.5, alignSelf: 'center'
                     }}>EXCLUSIVE ACCESS</Text>
 
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('CoffeeAutonomous')}>
 
                     <Feather
                         name={'settings'}
@@ -218,13 +276,25 @@ function Home({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            <FlatList
+            {/* <FlatList
                 data={DATA}
                 renderItem={({ item }) => <Item title={item.title} uri={item.uri} item={item} publisherName={item.publisherName} paraTitle={item.paraTitle} chapters={item.chapters} />}
                 keyExtractor={item => item.id}
 
-            />
+            /> */}
 
+            <View style={{ height: responsiveHeight(80.2) }}>
+
+                <SwiperFlatList
+                    autoplayDelay={1}
+                    vertical
+                    data={reedsData}
+                    renderItem={({ item }) => <Item title={item.name} uri={item.thumbnail}
+                        summaries={item.summaries} publisherName={item.channelName} item={item}
+                        item2={summeryData}
+                    />}
+                />
+            </View>
         </ View >
     );
 }
@@ -238,12 +308,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: responsiveFontSize(2.5), fontFamily: 'Poppins-Bold',
         color: 'black', width: responsiveWidth(74),
-        margin: 5, marginTop: 12,
-        fontWeight: '500',
+        margin: 5, marginTop: 12, width: responsiveWidth(70),
+        fontWeight: '500', letterSpacing: 0.5,
     },
     item: {
-        borderColor: 'rgb(224,224,224)', marginBottom: 15, borderWidth: 1, backgroundColor: 'white',
-        width: responsiveWidth(94), alignSelf: 'center', borderRadius: 15, elevation: 2, height: responsiveHeight(80)
+        borderColor: 'rgb(224,224,224)', borderWidth: 1, marginTop: 5, marginBottom: 5, backgroundColor: 'white',
+        width: responsiveWidth(94), alignSelf: 'center', borderRadius: 15, elevation: 2, height: responsiveHeight(79)
 
     },
 
